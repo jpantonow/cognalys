@@ -1,0 +1,16 @@
+# WebSettings mixed-content mode set to MIXED_CONTENT_ALWAYS_ALLOW.
+# Repaired where it is set: NEVER_ALLOW or COMPATIBILITY_MODE, or removed.
+rules:
+  - id: webview-mixed-content-always-allow
+    languages: [java, kotlin]
+    severity: WARNING
+    message: WebView loads mixed (HTTP in HTTPS) content unconditionally
+    pattern-either:
+      - pattern: $S.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW)
+      - pattern: $S.setMixedContentMode(android.webkit.WebSettings.MIXED_CONTENT_ALWAYS_ALLOW)
+      - pattern: $S.setMixedContentMode(0)
+      - pattern: $S.mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
+      - pattern: mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
+      - pattern: $S.mixedContentMode = android.webkit.WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
+      # Inside settings.apply { } with the qualified name (AI Hub's popup WebView).
+      - pattern: mixedContentMode = android.webkit.WebSettings.MIXED_CONTENT_ALWAYS_ALLOW

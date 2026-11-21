@@ -1,0 +1,28 @@
+# Exact versions the pipeline has been run and tested with: requirements.txt
+# and everything it pulls in, taken from the WSL venv (~/venv, Python 3.12.3)
+# on 2026-09-22. requirements.txt says what is needed; this says what was
+# used, so two machines can be made to run the same code.
+#
+#   python -m pip install -r requirements.lock
+#
+# Regenerate after changing requirements.txt, from a venv built from it:
+#   python -m pip install -r requirements.txt
+#   python -m pip freeze --all  (keep only the packages below and their deps)
+#
+# The experiment manifest records a digest of `pip freeze` for every frozen
+# run, so a run made under other versions is reported as a different
+# experiment even if this file is not used.
+certifi==2026.2.25
+charset-normalizer==3.4.7
+idna==3.11
+numpy==2.4.4
+pandas==3.0.2
+PuLP==3.3.2
+pyflakes==3.4.0
+python-dateutil==2.9.0.post0
+requests==2.33.1
+six==1.17.0
+tree-sitter==0.26.0
+tree-sitter-java==0.23.5
+tree-sitter-kotlin==1.1.0
+urllib3==2.6.3

@@ -1,0 +1,8 @@
+{
+ "pull_request": "https://github.com/BombusMod/BombusMod/pull/316",
+ "outcome": "incorporated",
+ "spec": "Closeable_MeaninglessClose",
+ "csv_class": "util.Strconv",
+ "method_name": "baosFromBase64",
+ "diff": "diff --git a/src/main/java/util/Strconv.java b/src/main/java/util/Strconv.java\nindex d010a1c..819c099 100644\n--- a/src/main/java/util/Strconv.java\n+++ b/src/main/java/util/Strconv.java\n@@ -163,7 +163,6 @@ public class Strconv {\n                 ibuf=1;\n             }\n         }\n-        try { baos.close(); } catch (Exception e) {}\n         //System.out.println(ibuf);\n         //System.out.println(baos.size());\n         return baos;"
+}

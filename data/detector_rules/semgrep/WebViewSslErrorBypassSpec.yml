@@ -1,0 +1,44 @@
+# onReceivedSslError that proceeds without a condition.
+# Repaired in the override: cancel(), or proceed only under a condition
+# (a pinned certificate, an explicit user decision).
+rules:
+  - id: webview-ssl-error-unconditional-proceed
+    languages: [kotlin]
+    severity: ERROR
+    message: onReceivedSslError accepts every TLS error unconditionally
+    patterns:
+      - pattern: $H.proceed()
+      - pattern-inside: |
+          fun onReceivedSslError(...) {
+            ...
+          }
+      - pattern-not-inside: |
+          if ($COND) {
+            ...
+          }
+      - pattern-not-inside: |
+          if ($COND) {
+            ...
+          } else {
+            ...
+          }
+  - id: webview-ssl-error-unconditional-proceed-java
+    languages: [java]
+    severity: ERROR
+    message: onReceivedSslError accepts every TLS error unconditionally
+    patterns:
+      - pattern: $H.proceed();
+      - pattern-inside: |
+          public void onReceivedSslError(...) {
+            ...
+          }
+      - pattern-not-inside: |
+          if ($COND) {
+            ...
+          }
+      - pattern-not-inside: |
+          if ($COND) {
+            ...
+          } else {
+            ...
+          }

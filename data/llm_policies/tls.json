@@ -1,0 +1,10 @@
+{
+  "policy_id": "tls",
+  "version": "2.0",
+  "rules": [
+    "Distinguish detector literal predicates, enabled protocols, negotiated protocols and runtime vulnerability.",
+    "Do not infer legacy protocol negotiation from SSLContext.getInstance(\"TLS\").",
+    "Do not weaken trust management, certificate validation or hostname verification.",
+    "Do not pin an extensible provider-selected protocol mechanism without explicit policy and compatibility evidence."
+  ]
+}

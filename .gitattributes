@@ -1,0 +1,30 @@
+# Line endings, decided by the repository instead of by each machine.
+#
+# With core.autocrlf=true and no attributes, files were committed with CRLF,
+# LF and both, and any tool that rewrote one of them produced a whole-file
+# diff (10,118 changed lines for 237 real ones in generate_error_fixes.py),
+# which hides the real change from review.
+#
+# Source and text are stored and checked out with LF: the pipeline runs in
+# WSL, where a shell script with CRLF does not execute.
+* text=auto eol=lf
+
+# Windows-only launchers keep CRLF.
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Data is kept byte for byte. The experiment manifest hashes the corpus CSV
+# and the specification JSON as they are, so normalising their line endings
+# would change the identity of every recorded experiment's inputs.
+*.csv -text
+data/** -text
+evals/** -text
+docs/experimentos/** -text
+
+# Binary formats.
+*.xlsx binary
+*.pdf binary
+*.png binary
+*.jpg binary
+*.apk binary
+*.jar binary

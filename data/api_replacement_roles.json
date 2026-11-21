@@ -1,0 +1,172 @@
+{
+  "description": "The role a deprecated API plays, and lexical patterns for the mechanisms an Android repository can already be using for that role. migration_grounding.py counts these mechanisms in the checkout so a migration can follow the maintainers' own idiom. Adding a deprecated API means adding its fully qualified name to applies_to of the role it plays; adding a mechanism means adding its patterns. The patterns decide nothing: they only locate existing code a reviewer can read. `guarantees` names what a mechanism provides, `requires` in documented_semantics names what an invariant needs, and `platform` marks a mechanism that is available without a new dependency (JDK or Android framework), so it can be recommended even when the repository does not use it yet. A mechanism's guarantees are only what the mechanism itself documents; a repository helper has none here, and its behaviour is read from its implementation instead.",
+  "version": "1.1",
+  "roles": [
+    {
+      "role": "background_work_with_main_thread_result",
+      "summary": "Run work off the main thread and deliver its result, progress or cancellation back on the main thread.",
+      "applies_to": [
+        "android.os.AsyncTask",
+        "android.content.AsyncTaskLoader",
+        "androidx.loader.content.AsyncTaskLoader",
+        "android.support.v4.content.AsyncTaskLoader"
+      ],
+      "documented_semantics": [
+        {
+          "applies_to": "android.os.AsyncTask",
+          "when": "execute",
+          "requires": ["serial_execution"],
+          "invariant": "execute(Params...) runs doInBackground on one background thread shared by every AsyncTask in the process, so tasks run one at a time in submission order. A replacement that runs them concurrently changes ordering and contention and must say so.",
+          "source": "https://developer.android.com/reference/android/os/AsyncTask#order-of-execution"
+        },
+        {
+          "applies_to": "android.os.AsyncTask",
+          "when": "execute",
+          "requires": [],
+          "invariant": "A task instance can be executed only once; a second execute throws IllegalStateException.",
+          "source": "https://developer.android.com/reference/android/os/AsyncTask#threading-rules"
+        },
+        {
+          "applies_to": "android.os.AsyncTask",
+          "when": "executeOnExecutor",
+          "requires": [],
+          "invariant": "executeOnExecutor(executor, ...) runs doInBackground on the executor passed; THREAD_POOL_EXECUTOR runs tasks in parallel.",
+          "source": "https://developer.android.com/reference/android/os/AsyncTask#order-of-execution"
+        },
+        {
+          "applies_to": "android.os.AsyncTask",
+          "when": "doInBackground",
+          "requires": ["off_caller_thread"],
+          "invariant": "An exception thrown from doInBackground is rethrown on the worker thread (\"An error occurred while executing doInBackground()\") and terminates the process. A replacement must not silently discard it, for example by submitting to an executor and never reading the Future.",
+          "source": "https://android.googlesource.com/platform/frameworks/base/+/refs/heads/main/core/java/android/os/AsyncTask.java"
+        },
+        {
+          "applies_to": "android.os.AsyncTask",
+          "when": "onPostExecute",
+          "requires": ["main_thread_dispatch"],
+          "invariant": "onPostExecute runs on the main thread with the result of doInBackground, and is not invoked for a cancelled task (onCancelled is invoked instead).",
+          "source": "https://developer.android.com/reference/android/os/AsyncTask#cancelling-a-task"
+        },
+        {
+          "applies_to": "android.os.AsyncTask",
+          "when": "cancel",
+          "requires": ["cancellation_handle", "isolated_interrupts"],
+          "invariant": "cancel(true) interrupts the thread running doInBackground and guarantees onPostExecute is not called afterwards, even for a result already computed.",
+          "source": "https://developer.android.com/reference/android/os/AsyncTask#cancel(boolean)"
+        }
+      ],
+      "mechanisms": [
+        {
+          "name": "java.util.concurrent executor",
+          "platform": true,
+          "guarantees": ["serial_execution", "cancellation_handle", "isolated_interrupts", "off_caller_thread"],
+          "guarantees_note": "Executors.newSingleThreadExecutor() runs tasks one at a time in submission order; Future.cancel(true) interrupts the running task; ThreadPoolExecutor clears a worker's interrupt status before running its next task.",
+          "patterns": ["\\bExecutors\\s*\\.\\s*new\\w*\\s*\\(", "\\bExecutorService\\b", "\\bThreadPoolExecutor\\b"]
+        },
+        {
+          "name": "main-thread Handler or runOnUiThread",
+          "platform": true,
+          "guarantees": ["main_thread_dispatch"],
+          "guarantees_note": "Handler(Looper.getMainLooper()).post runs the runnable on the main thread.",
+          "patterns": ["\\bHandler\\s*\\(\\s*Looper\\s*\\.\\s*getMainLooper\\s*\\(", "\\brunOnUiThread\\s*[({]"]
+        },
+        {
+          "name": "Kotlin coroutines",
+          "platform": false,
+          "guarantees": ["cancellation_handle", "main_thread_dispatch", "off_caller_thread"],
+          "guarantees_note": "A Job cancels its coroutine; Dispatchers.Main dispatches to the main thread. Serial execution needs an explicitly single-threaded dispatcher.",
+          "patterns": ["\\b(?:lifecycleScope|viewModelScope|GlobalScope)\\s*\\.\\s*launch\\b", "\\bCoroutineScope\\s*\\(", "\\bwithContext\\s*\\(\\s*Dispatchers\\s*\\."]
+        },
+        {
+          "name": "project background-thread helper",
+          "platform": false,
+          "guarantees": [],
+          "guarantees_note": "A repository or library helper guarantees nothing by catalogue; its behaviour is read from its implementation.",
+          "patterns": ["\\b\\w*[Bb]ackground[Tt]hread\\s*[({]"]
+        },
+        {
+          "name": "WorkManager",
+          "platform": false,
+          "guarantees": ["cancellation_handle", "off_caller_thread"],
+          "guarantees_note": "Scheduled, persistable work; not an in-process ordered queue and not a main-thread result channel.",
+          "patterns": ["\\bWorkManager\\s*\\.\\s*getInstance\\b", "\\bOneTimeWorkRequest\\w*\\b"]
+        },
+        {
+          "name": "RxJava schedulers",
+          "platform": false,
+          "guarantees": ["cancellation_handle", "off_caller_thread"],
+          "guarantees_note": "Disposable cancels the subscription; main-thread delivery needs RxAndroid's AndroidSchedulers.mainThread().",
+          "patterns": ["\\.\\s*subscribeOn\\s*\\(", "\\bSchedulers\\s*\\.\\s*io\\s*\\("]
+        }
+      ]
+    },
+    {
+      "role": "in_process_event_delivery",
+      "summary": "Deliver an event from one component to observers inside the same process.",
+      "applies_to": [
+        "androidx.localbroadcastmanager.content.LocalBroadcastManager",
+        "android.support.v4.content.LocalBroadcastManager"
+      ],
+      "documented_semantics": [
+        {
+          "applies_to": "androidx.localbroadcastmanager.content.LocalBroadcastManager",
+          "when": "sendBroadcast",
+          "requires": ["main_thread_dispatch"],
+          "invariant": "sendBroadcast returns immediately; matching receivers are invoked later on the application's main thread, not on the sender's thread.",
+          "source": "https://developer.android.com/reference/androidx/localbroadcastmanager/content/LocalBroadcastManager#sendBroadcast(android.content.Intent)"
+        },
+        {
+          "applies_to": "androidx.localbroadcastmanager.content.LocalBroadcastManager",
+          "when": "sendBroadcastSync",
+          "requires": [],
+          "invariant": "sendBroadcastSync blocks and dispatches to every matching receiver before it returns.",
+          "source": "https://developer.android.com/reference/androidx/localbroadcastmanager/content/LocalBroadcastManager#sendBroadcastSync(android.content.Intent)"
+        },
+        {
+          "applies_to": "androidx.localbroadcastmanager.content.LocalBroadcastManager",
+          "when": "unregisterReceiver",
+          "requires": ["unsubscribe"],
+          "invariant": "A receiver is invoked only while registered; after unregisterReceiver it receives nothing, including broadcasts sent before but not yet delivered.",
+          "source": "https://android.googlesource.com/platform/frameworks/support/+/androidx-main/localbroadcastmanager/localbroadcastmanager/src/main/java/androidx/localbroadcastmanager/content/LocalBroadcastManager.java"
+        }
+      ],
+      "mechanisms": [
+        {
+          "name": "LiveData",
+          "platform": false,
+          "guarantees": ["main_thread_dispatch", "unsubscribe"],
+          "guarantees_note": "Observers are called on the main thread and only while their lifecycle is active; removeObserver stops delivery. LiveData keeps the latest value and replays it to new observers.",
+          "patterns": ["\\bMutableLiveData\\s*[<(]", "\\bLiveData\\s*<"]
+        },
+        {
+          "name": "Kotlin Flow",
+          "platform": false,
+          "guarantees": ["unsubscribe"],
+          "guarantees_note": "Cancelling the collecting coroutine stops delivery; the collector's dispatcher decides the thread.",
+          "patterns": ["\\bMutableSharedFlow\\s*[<(]", "\\bMutableStateFlow\\s*[<(]"]
+        },
+        {
+          "name": "listener interface registry",
+          "platform": false,
+          "guarantees": [],
+          "guarantees_note": "A repository-defined registry guarantees what its implementation does; read it before relying on thread or ordering behaviour.",
+          "patterns": ["\\binterface\\s+I?\\w*Listener\\b", "\\b(?:register|add)\\w*Listener\\s*\\("]
+        },
+        {
+          "name": "event bus",
+          "platform": false,
+          "guarantees": ["unsubscribe"],
+          "guarantees_note": "unregister stops delivery; the subscriber's ThreadMode decides the thread.",
+          "patterns": ["\\bEventBus\\s*\\.\\s*getDefault\\s*\\(", "@Subscribe\\b"]
+        },
+        {
+          "name": "Rx subjects",
+          "platform": false,
+          "guarantees": ["unsubscribe"],
+          "guarantees_note": "Disposing the subscription stops delivery; observeOn decides the thread.",
+          "patterns": ["\\b(?:Publish|Behavior)(?:Subject|Relay|Processor)\\s*\\.\\s*create\\b"]
+        }
+      ]
+    }
+  ]
+}

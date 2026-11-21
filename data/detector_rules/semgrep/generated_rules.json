@@ -1,0 +1,552 @@
+{
+  "format_version": 1,
+  "rules": {
+    "AlgorithmParametersSpec": {
+      "attempts": 1,
+      "case_fingerprints": [
+        "ff8f9d862756b577d1786a2f3516bceb9f79be3afcddab7c24ac3a971054f811"
+      ],
+      "cases": [],
+      "model": "gpt-5.6-terra",
+      "problems": [],
+      "prompt_version": "detector-rule-proposal-v1",
+      "reason": "not_local: Whether an `AlgorithmParameters.init(...)` call violates this CrySL specification depends on abstract `preparedAlg` and algorithm-specific `preparedIV`/`preparedDH`/`preparedPBE`/`preparedOAEP` facts. The specification does not define source-visible local producers for those facts, and valid bytes or parameter specs may be produced, validated, serialized, or passed into the method elsewhere. A Semgrep pattern that flags `init` without recognizing such provenance would continue to fire after a correct repair that supplies properly prepared data, while a whitelist-only `getInstance` pattern would miss dynamic but constrained algorithms and fire on otherwise compliant local sequences. In the reported method, the algorithm is obtained dynamically from `cipher.getParameters().getAlgorithm()` and the encoded bytes come from the field `mParameters`; neither required fact can be established or repaired from this method alone.",
+      "recorded_at": "2026-10-07T03:08:49+00:00",
+      "specification_sha256": "f44e9311a76e13ff496e3611aa3ac1077b347f57e993e4b9c001ae93c0ac37c3",
+      "status": "not_local"
+    },
+    "CipherSpec": {
+      "attempts": 1,
+      "case_fingerprints": [
+        "0c571a15092dfe23d027b74427a4db0d0f2ff6544d62cd47e288d3cfddd5a562",
+        "c97a04563d3a9a6c638b46678288917180f8d9d17065fc9697b29756cab9f91a",
+        "dfc2036db3de6d6463d8b06991105b1e97112b269e6eacdb16debdfadf6d3fdc",
+        "eba0b3137be3603c3b8aa497a369fa3ced8af83103da677c3d4e1fe32e5737ff"
+      ],
+      "cases": [],
+      "model": "gpt-5.6-terra",
+      "problems": [],
+      "prompt_version": "detector-rule-proposal-v1",
+      "reason": "not local: CipherSpec is a per-object, resolved-call typestate and predicate rule. Whether a Cipher parameter has had required Get/Init events, whether its key/randomness/parameters meet CrySL predicates, and whether plaintext was MACed often depends on callers or other methods. In particular, the reported CryptoUtils.encrypt method only calls cipher.doFinal(data) on a Cipher supplied as a parameter; it can be fully compliant when its caller obtained and initialized that Cipher, yet a local rule matching doFinal would still fire after any correct caller-side repair. Likewise, transformation values such as algorithm or TRANSFORMATION may be resolved outside the method. A syntactic local rule would therefore create false positives and would not reliably be silenced by correct repairs in the reported method.",
+      "recorded_at": "2026-10-18T15:07:55+00:00",
+      "specification_sha256": "c3e963a2c378eff643ead2eca2b532f72e71d8605d02d17f616321cc5f808b07",
+      "status": "not_local"
+    },
+    "GCMParameterSpecSpec": {
+      "attempts": 1,
+      "case_fingerprints": [
+        "225d7eb46ce6d95d0487e989198d894881fc7c5ba94a4a3cefc096906e831268"
+      ],
+      "cases": [],
+      "model": "gpt-5.6-terra",
+      "problems": [],
+      "prompt_version": "detector-rule-proposal-v1",
+      "reason": "not_local: Whether `randomized[src]` holds is a semantic provenance property and cannot be determined reliably from the `new GCMParameterSpec(...)` expression or, in general, from the reported method alone. The reported finding passes the method parameter `nonce`; its provenance is at the caller or elsewhere, so a compliant caller-provided random nonce and a deterministic/reused nonce are textually indistinguishable in this method. Likewise, runtime values of `tagLen`, `offset`, `len`, and `length[src]` cannot generally be proven from syntax alone. A lexical rule that flags all constructor calls (or all parameter-derived IVs) would continue firing after a correct repair that preserves a caller-provided but demonstrably randomized nonce, and would flag compliant code. Conversely, a rule that treats a local `SecureRandom` call as sufficient would not implement the required semantic provenance predicate. Additionally, c1's required offset/len constraints are undefined because those variables are absent from the two-argument constructor. Therefore no method-local Semgrep rule can be an executable oracle for this specification.",
+      "recorded_at": "2026-10-18T15:08:09+00:00",
+      "specification_sha256": "765dc8ec68d510edb3c361ef3298b378cb8f1ea7078915027bacf2d64b03ad4b",
+      "status": "not_local"
+    },
+    "IvParameterSpecSpec": {
+      "attempts": 1,
+      "case_fingerprints": [
+        "3ad5119d7fa90a887a2ba66554edc73458406a82d4c76797a3f1f8288cb48de0",
+        "3e7d4c772bd0bd58f0c8bf8285d56dd0cb0e3b10f536eaea299eaec27a244043",
+        "9ce56c9abf6ce2a0bc7f6e4cde9eca0285de699e8684c9e1cafba1a338540fff",
+        "d2c8219872cfca769405572780a79f278c33eda648802883149803cc30042c05"
+      ],
+      "cases": [],
+      "model": "gpt-5.6-terra",
+      "problems": [],
+      "prompt_version": "detector-rule-proposal-v1",
+      "reason": "not_local: Whether the byte array passed to IvParameterSpec has the required randomized provenance cannot be decided reliably from the constructor expression or reported method alone. In particular, compliant IVs may come from helpers, native/dependency code, other modules, unmodeled transformations/copies, or decryption-message inputs; these are indistinguishable locally from non-random arrays. A broad constructor-match rule would continue firing after correct repairs that replace a local IV construction with a suitable helper or externally supplied IV, and would falsely report legitimate decryption IV parsing. Conversely, excluding a method merely because it contains SecureRandom usage would miss violations such as the provided Kotlin example, where randomness is used for salt but the IV is derived through other values. Semgrep structural patterns and method-text regex metadata cannot provide the necessary provenance/dataflow oracle across these cases.",
+      "recorded_at": "2026-10-07T03:09:41+00:00",
+      "specification_sha256": "2ffb9cacb240e77d6695462d4aa3049d9fb8a513203ec3826915a45a0c8f01ce",
+      "status": "not_local"
+    },
+    "KeyPairGeneratorSpec": {
+      "attempts": 1,
+      "case_fingerprints": [
+        "7f57793ec59b7fda49515490c5becfef4417ef001a770d289730396770fdd663",
+        "b872ebe699dd1c7fa1084e44ad2217d838ea052ae3fc6b9447aff6d90d3bceed"
+      ],
+      "cases": [],
+      "model": "claude-sonnet-5-5",
+      "problems": [],
+      "prompt_version": "detector-rule-proposal-v1",
+      "reason": "Both reported cases pass a non-literal key size to initialize(), and the first also passes a non-literal algorithm to getInstance(). The CrySL constraints depend on the algorithm and key-size values, such as RSA minimum sizes or DSA being exactly 3072. Those values come from callers, so the method alone does not show whether they violate the spec. A correct repair could also take many shapes: hard-coding a literal, clamping or validating the parameter, or changing the callers. A method-local rule could not reliably tell these apart, so it would either keep firing after a valid repair or fire on compliant code.",
+      "recorded_at": "2026-10-19T03:53:44+00:00",
+      "specification_sha256": "d0893e5c60ca0edb1f45f47eab7e974bee337e7ed4d48f208ff09a2d87d3da91",
+      "status": "not_local"
+    },
+    "KeyStoreSpec": {
+      "attempts": 1,
+      "case_fingerprints": [
+        "193829be0084f579660538e539757e0ce30ce68964453e000564d9576a575900",
+        "19c754a6954012a9d29599df81230a308f0c6350d79dcace05f6dacd1bd80341",
+        "38c699618087abb035bf3b1f02f5629d0606accd1912e6f7f446afa39c138e9e",
+        "8f62fd90b9774c29cb522b36451c66ef468a41e5ed0d1bd81ee06c2682245981",
+        "d35a8cd51d8c4c8ea69bfc6c91c5e4e33a5682ce5d831e9de3fc9c81909f9ae8",
+        "dd7caf780a49a7d5f71f8fa1cd29fe81679756a137f3e4562fa9e5a01c38401f"
+      ],
+      "cases": [],
+      "model": "gpt-5.6-terra",
+      "problems": [],
+      "prompt_version": "detector-rule-proposal-v1",
+      "reason": "not_local: KeyStoreSpec is a type-resolved, object-identity-sensitive CrySL typestate rule. Whether a `.load`, `.getEntry`, `.getKey`, `.setEntry`, or `.store` call violates the protocol depends on the same resolved `java.security.KeyStore` object's factory and prior/following calls, which commonly occur in constructors, fields, helpers, or callers rather than the reported method. The reported Android methods that only call `keyStore.getEntry(...)` cannot be classified from their method body: the field may have been obtained and loaded correctly elsewhere. Conversely, AndroidKeyStore intentionally uses `getInstance(\"AndroidKeyStore\")`, persists `setEntry` without `store`, and makes `store` unsupported, so a local syntactic rule for the stated whitelist/write trace would flag compliant Android code and remain after a correct repair. Semgrep source patterns also cannot establish that representative method names resolve to `java.security.KeyStore` rather than an unrelated wrapper. Therefore no method-local Semgrep rule can reliably be silenced by the correct repairs without firing on compliant code.",
+      "recorded_at": "2026-10-19T13:31:09+00:00",
+      "specification_sha256": "9293fd1ad838f68a6360719f762ac119f38d780f67598f7045ebc235eb2d1f37",
+      "status": "not_local"
+    },
+    "MacSpec": {
+      "attempts": 1,
+      "case_fingerprints": [
+        "371ceedebd444b02e024be62cad65331c0b1d5771cde73170cb98e42d8e7be17",
+        "489e703e7390fb9f81702e3bea8c51e6ed8d73e90a9905f32c3a148f7e20a1d1"
+      ],
+      "cases": [],
+      "model": "gpt-5.6-terra",
+      "problems": [],
+      "prompt_version": "detector-rule-proposal-v1",
+      "reason": "The protocol cannot be made into a reliable method-local Semgrep oracle. Its applicability depends on resolved overloads/types, runtime algorithm values, array lengths and offsets, lifecycle/order across object flow, and abstract `generatedKey`, `preparedHMAC`, `encrypted`, and `macced` predicates. None of those predicates has a Java-source definition that Semgrep could recognize. In particular, the reported methods use variable algorithms and `SecretKeySpec` keys; a pattern that flags these would also flag correct local repairs using a runtime-resolved whitelisted algorithm or valid key provenance, while a pattern requiring literals or selected construction forms would miss the supplied findings. Therefore no rule can both fire on the reported cases and be silenced by every correct repair made only in the reported method without unacceptable false positives.",
+      "recorded_at": "2026-10-19T13:31:25+00:00",
+      "specification_sha256": "4eb002d46bac2072c8717081ddf004e5824f16158cdc717700e247b9fe7ae5e7",
+      "status": "not_local"
+    },
+    "MessageDigestSpec": {
+      "attempts": 1,
+      "case_fingerprints": [
+        "19b86501a401625d0bbfd0797aff386289d51ee0b65bbd5bf43a93609658e131",
+        "289054144e4370c186e156f61eaacaab6994b3b679ddd3440323f3cee31b3743",
+        "304fd3e8841cac5c2d136d538a66722c8b5ee9f4ad28b7e9fd66a37802e95eef",
+        "44db2f94f4273060cebbb58a402a2bb1f41745c66ba56ab250b81dd4369d1cd9",
+        "5d2357e946347e928f196276e39f7df225cdf706ca976085981ec2c0b0198456",
+        "70e19335e3754807c671be0c62068105ac491840a7964b80122d810932c29e76",
+        "7cf760e2ea9e02fd428a4ac01a3090b4a9b2dd060cf8439ac7553c6a78b4e6f0",
+        "86ffa45ac75a4628ea8ec5a3b3eabfe39b7e4bffa4b5556f4b9a392aad99eed5",
+        "886aaa1ba495e50205f691744245f9118b9bec24c8a9d0aa1e2f10e0b9c7f83f",
+        "b86d8a2faa4e761bc112f89aa359de50dbb502dc44c09b45a255c697d944da88",
+        "cffadff4d20f21e7a26496535469a33030c217b2c278b3eabe5cc8732108dc9d"
+      ],
+      "cases": [
+        {
+          "detail": "",
+          "expected": "fires",
+          "got": "fires",
+          "label": "com.vrem.wifianalyzer_71.apk com.vrem.wifianalyzer.wifi.accesspoint.AccessPointsAdapterData.calculateChildType",
+          "origin": "finding",
+          "required": false
+        },
+        {
+          "detail": "",
+          "expected": "fires",
+          "got": "fires",
+          "label": "com.schwegelbin.openbible_46.apk com.schwegelbin.openbible.logic.GettersKt.getChecksum",
+          "origin": "finding",
+          "required": false
+        },
+        {
+          "detail": "",
+          "expected": "fires",
+          "got": "fires",
+          "label": "de.stephanlindauer.criticalmaps_104.apk de.stephanlindauer.criticalmaps.utils.AeSimpleSHA1.SHA1",
+          "origin": "finding",
+          "required": false
+        },
+        {
+          "detail": "",
+          "expected": "fires",
+          "got": "silent",
+          "label": "eu.faircode.email_2322.apk eu.faircode.email.Helper.getFingerprint",
+          "origin": "finding",
+          "required": false
+        },
+        {
+          "detail": "",
+          "expected": "fires",
+          "got": "silent",
+          "label": "com.password.monitor_102.apk com.password.monitor.utils.HashUtils$Companion$getHashPrefixAndSuffix$2.getHashPrefixAndSuffix",
+          "origin": "finding",
+          "required": false
+        },
+        {
+          "detail": "",
+          "expected": "fires",
+          "got": "fires",
+          "label": "net.gaast.giggity_769.apk net.gaast.giggity.Schedule$Item.hashCode",
+          "origin": "finding",
+          "required": false
+        },
+        {
+          "detail": "",
+          "expected": "fires",
+          "got": "silent",
+          "label": "com.password.monitor_102.apk com.password.monitor.utils.HashUtils$Companion$getHashPrefixAndSuffix$2.getHashPrefixAndSuffix at 3ef9c433cba6",
+          "origin": "finding",
+          "required": false
+        },
+        {
+          "detail": "",
+          "expected": "fires",
+          "got": "fires",
+          "label": "com.sapuseven.untis_29198884.apk com.sapuseven.untis.data.cache.DiskCache.getCacheFile at 250d629ba531",
+          "origin": "finding",
+          "required": false
+        },
+        {
+          "detail": "",
+          "expected": "fires",
+          "got": "fires",
+          "label": "com.schwegelbin.openbible_46.apk com.schwegelbin.openbible.logic.GettersKt.getChecksum at 445d427498af",
+          "origin": "finding",
+          "required": false
+        },
+        {
+          "detail": "",
+          "expected": "fires",
+          "got": "fires",
+          "label": "com.vrem.wifianalyzer_71.apk com.vrem.wifianalyzer.wifi.accesspoint.AccessPointsAdapterData.calculateChildType at 131c2fae4f86",
+          "origin": "finding",
+          "required": false
+        },
+        {
+          "detail": "",
+          "expected": "fires",
+          "got": "fires",
+          "label": "com.vrem.wifianalyzer_71.apk com.vrem.wifianalyzer.wifi.graphutils.GraphWrapper.calculateGraphType at 131c2fae4f86",
+          "origin": "finding",
+          "required": false
+        },
+        {
+          "detail": "",
+          "expected": "fires",
+          "got": "fires",
+          "label": "de.stephanlindauer.criticalmaps_104.apk de.stephanlindauer.criticalmaps.utils.AeSimpleSHA1.SHA1 at d78a78eb6717",
+          "origin": "finding",
+          "required": false
+        },
+        {
+          "detail": "",
+          "expected": "fires",
+          "got": "silent",
+          "label": "eu.faircode.email_2322.apk eu.faircode.email.Helper.getFingerprint at 4b1c9fa27a21",
+          "origin": "finding",
+          "required": false
+        },
+        {
+          "detail": "",
+          "expected": "fires",
+          "got": "fires",
+          "label": "github.paroj.dsub2000_217.apk github.paroj.dsub2000.util.Util.md5Hex at 474f6ca84764",
+          "origin": "finding",
+          "required": false
+        },
+        {
+          "detail": "",
+          "expected": "fires",
+          "got": "fires",
+          "label": "net.gaast.giggity_769.apk net.gaast.giggity.Schedule$Item.hashCode at 122b04236191",
+          "origin": "finding",
+          "required": false
+        },
+        {
+          "detail": "",
+          "expected": "fires",
+          "got": "fires",
+          "label": "org.cry.otp_31.apk org.cry.otp.MD5.MD5 at 3fc6c3d20d7b",
+          "origin": "finding",
+          "required": false
+        },
+        {
+          "detail": "",
+          "expected": "fires",
+          "got": "fires",
+          "label": "org.quantumbadger.redreader_117.apk org.quantumbadger.redreader.common.General.sha1 at ac08f90d2330",
+          "origin": "finding",
+          "required": false
+        },
+        {
+          "detail": "",
+          "expected": "fires",
+          "got": "fires",
+          "label": "example 1 (Method: BadMd5.hash. MD5 is a non-allow-listed literal.)",
+          "origin": "example",
+          "required": true
+        },
+        {
+          "detail": "",
+          "expected": "fires",
+          "got": "fires",
+          "label": "example 2 (Method: BadSha1.hash. SHA-1 is a non-allow-listed literal.)",
+          "origin": "example",
+          "required": true
+        },
+        {
+          "detail": "",
+          "expected": "silent",
+          "got": "silent",
+          "label": "example 3 (Method: RepairedMd5.hash. Correct literal-algorithm repair.)",
+          "origin": "example",
+          "required": true
+        },
+        {
+          "detail": "",
+          "expected": "silent",
+          "got": "silent",
+          "label": "example 4 (Method: RepairedSha1.hash. Correct literal-algorithm repair.)",
+          "origin": "example",
+          "required": true
+        },
+        {
+          "detail": "",
+          "expected": "silent",
+          "got": "silent",
+          "label": "example 5 (Method: CacheKeyRepair.cacheFileKey. A cache-key use is only compliant with this)",
+          "origin": "example",
+          "required": true
+        },
+        {
+          "detail": "",
+          "expected": "silent",
+          "got": "silent",
+          "label": "example 6 (Method: VisibleDynamicAllowList.hash. Both possible runtime values are allowed; )",
+          "origin": "example",
+          "required": true
+        },
+        {
+          "detail": "",
+          "expected": "silent",
+          "got": "silent",
+          "label": "example 7 (Method: PositiveRangeRepair.hash. The zero-length case uses the permitted digest)",
+          "origin": "example",
+          "required": true
+        },
+        {
+          "detail": "",
+          "expected": "silent",
+          "got": "silent",
+          "label": "example 8 (Method: DigestWithInput.hash. digest(byte[]) is a permitted completion branch wi)",
+          "origin": "example",
+          "required": true
+        }
+      ],
+      "model": "gpt-5.6-terra",
+      "problems": [],
+      "prompt_version": "detector-rule-proposal-v1",
+      "reason": "The allow-list violation is locally and safely detectable when the reported method contains a direct MessageDigest.getInstance call whose algorithm is a string literal other than SHA-256, SHA-384, or SHA-512. Replacing that literal with an allowed literal silences the finding. The rule intentionally does not report variable/configuration-derived algorithms, delegated factories, dependency-injected MessageDigest instances, protocol ordering, or array-range predicates: those either cannot be decided reliably from the factory expression or are not safely expressible as a local syntactic oracle. In particular, a caller such as getFingerprint(context, \"SHA1\") has no locally visible MessageDigest factory and is not matched.",
+      "recorded_at": "2026-10-07T03:14:13+00:00",
+      "rule_sha256": "2da80d36f501a65cf0fa8800c2a0912be79108f3ddcddf0c376590a139090a74",
+      "specification_sha256": "d0b108c4c2e3672e17cce31b2e8ec718a9184c4f69a494795464a20d15a2ab32",
+      "status": "accepted"
+    },
+    "PBEKeySpecSpec": {
+      "attempts": 1,
+      "case_fingerprints": [
+        "3c950a75369089b4dad667ffeef422d2af45524b7ea14d09d6006d835540e1e2",
+        "9ce56c9abf6ce2a0bc7f6e4cde9eca0285de699e8684c9e1cafba1a338540fff"
+      ],
+      "cases": [],
+      "model": "gpt-5.6-terra",
+      "problems": [],
+      "prompt_version": "detector-rule-proposal-v1",
+      "reason": "not_local: Compliance depends on interprocedural/static facts that are not reliably visible in the reported method alone: whether a salt parameter was generated from a recognized randomized source, whether password input is derived from an external secret rather than a hard-coded/String source, and whether the PBEKeySpec is cleared through an alias, helper, or caller-managed cleanup. In the first reported method, `salt` and `iterations` are parameters, so a method-local Semgrep rule cannot distinguish a compliant caller-provenanced salt/iteration value from an unsafe one. A rule requiring visible local salt generation and a direct `spec.clearPassword()` would keep firing after correct repairs that establish these facts elsewhere, violating the executable-oracle requirement.",
+      "recorded_at": "2026-10-20T16:09:05+00:00",
+      "specification_sha256": "2cc63d85248968883802504612776adfe53eafb56581de52e1a1613bc6edfe63",
+      "status": "not_local"
+    },
+    "SSLContextSpec": {
+      "attempts": 1,
+      "case_fingerprints": [
+        "0e50ffcddc7d48cb2952913bcbe90354d76fae980ce61e74e93133086a18b521",
+        "2830b43f6db0d099b210594815f378c632870e10dd143460381fc6b46c837ddb",
+        "60d9a5277c7097873494b83d3e7310ba03b4c241503dead3e9eb72fff26dad29",
+        "82126f23c89167d2f2cb283a8257d3c1324acfb0d8ed14de1f4100a2b18515cf",
+        "c685aa0b15cc1ebf6f61bf62089d04879738f0f99a0450e8c1d6a2d1b40d7e81",
+        "ce9c321a68e74d053171bcff62d01e70ca7940f4de24d8d2dfbeb5d4a6fbf197"
+      ],
+      "cases": [
+        {
+          "detail": "",
+          "expected": "fires",
+          "got": "fires",
+          "label": "de.lukasneugebauer.nextcloudcookbook_62.apk de.lukasneugebauer.nextcloudcookbook.core.util.OkHttpClientProvider.configureTrustAllCertificates",
+          "origin": "finding",
+          "required": false
+        },
+        {
+          "detail": "",
+          "expected": "fires",
+          "got": "fires",
+          "label": "com.etesync.syncadapter_20700.apk com.etesync.syncadapter.HttpClient$Builder.build",
+          "origin": "finding",
+          "required": false
+        },
+        {
+          "detail": "",
+          "expected": "fires",
+          "got": "fires",
+          "label": "com.ivanovsky.passnotes_11700.apk com.ivanovsky.passnotes.data.repository.file.webdav.HttpClientFactory.createHttpClient",
+          "origin": "finding",
+          "required": false
+        },
+        {
+          "detail": "",
+          "expected": "fires",
+          "got": "fires",
+          "label": "github.paroj.dsub2000_217.apk github.paroj.dsub2000.service.RESTMusicService.RESTMusicService",
+          "origin": "finding",
+          "required": false
+        },
+        {
+          "detail": "",
+          "expected": "fires",
+          "got": "fires",
+          "label": "org.openhab.habdroid_589.apk org.openhab.habdroid.core.connection.ConnectionFactory.updateHttpClientForClientCert",
+          "origin": "finding",
+          "required": false
+        },
+        {
+          "detail": "",
+          "expected": "fires",
+          "got": "fires",
+          "label": "com.nononsenseapps.feeder.play_4025.apk com.nononsenseapps.jsonfeed.OkHttpBuilderExtensionsKt.trustAllCerts",
+          "origin": "finding",
+          "required": false
+        },
+        {
+          "detail": "",
+          "expected": "fires",
+          "got": "fires",
+          "label": "com.ivanovsky.passnotes_11700.apk com.ivanovsky.passnotes.data.repository.file.webdav.HttpClientFactory.createHttpClient at 5fbadf408925",
+          "origin": "finding",
+          "required": false
+        },
+        {
+          "detail": "",
+          "expected": "fires",
+          "got": "fires",
+          "label": "com.nononsenseapps.feeder.play_4025.apk com.nononsenseapps.jsonfeed.OkHttpBuilderExtensionsKt.trustAllCerts at 617f6b5cef7d",
+          "origin": "finding",
+          "required": false
+        },
+        {
+          "detail": "",
+          "expected": "fires",
+          "got": "fires",
+          "label": "de.lukasneugebauer.nextcloudcookbook_62.apk de.lukasneugebauer.nextcloudcookbook.core.util.OkHttpClientProvider.configureTrustAllCertificates at cf063f9be441",
+          "origin": "finding",
+          "required": false
+        },
+        {
+          "detail": "",
+          "expected": "fires",
+          "got": "fires",
+          "label": "github.paroj.dsub2000_217.apk github.paroj.dsub2000.service.RESTMusicService.RESTMusicService at 474f6ca84764",
+          "origin": "finding",
+          "required": false
+        },
+        {
+          "detail": "",
+          "expected": "fires",
+          "got": "fires",
+          "label": "example 1 (Generic TLS protocol name is rejected.)",
+          "origin": "example",
+          "required": true
+        },
+        {
+          "detail": "",
+          "expected": "fires",
+          "got": "fires",
+          "label": "example 2 (SSL protocol name is rejected.)",
+          "origin": "example",
+          "required": true
+        },
+        {
+          "detail": "",
+          "expected": "fires",
+          "got": "fires",
+          "label": "example 3 (getDefault is forbidden.)",
+          "origin": "example",
+          "required": true
+        },
+        {
+          "detail": "",
+          "expected": "silent",
+          "got": "silent",
+          "label": "example 4 (Repaired: exact allowed literal.)",
+          "origin": "example",
+          "required": true
+        },
+        {
+          "detail": "",
+          "expected": "silent",
+          "got": "silent",
+          "label": "example 5 (Repaired: TLSv1.3 literal.)",
+          "origin": "example",
+          "required": true
+        },
+        {
+          "detail": "",
+          "expected": "silent",
+          "got": "silent",
+          "label": "example 6 (Null-argument init is API-valid and the rule does not check init provenance.)",
+          "origin": "example",
+          "required": true
+        }
+      ],
+      "model": "claude-sonnet-5-5",
+      "problems": [],
+      "prompt_version": "detector-rule-proposal-v1",
+      "reason": "The violation is visible in the reported method: SSLContext.getInstance is called with a literal protocol other than TLSv1.2 or TLSv1.3, or SSLContext.getDefault() is called. Changing the literal to TLSv1.2/TLSv1.3, or replacing getDefault with getInstance(\"TLSv1.2\"), silences the rule. It does not fire on init arguments, because that provenance is not reliably checkable locally. Non-literal protocol arguments are ignored because they cannot be judged locally.",
+      "recorded_at": "2026-10-19T03:54:48+00:00",
+      "rule_sha256": "5f5e521a3ad18daf67b78d431e1bafe813ce0f85210471f6202adc1f7c1e520b",
+      "specification_sha256": "6620244c1c317154af5c431d098578d08ad87d6e3b4dee315ee86432474ec718",
+      "status": "accepted"
+    },
+    "SSLEngineSpec": {
+      "attempts": 1,
+      "case_fingerprints": [
+        "4e3c8a7496799df59ed0595f6eba54244966ab7c28d36088ae54165fd109880f"
+      ],
+      "cases": [],
+      "model": "gpt-5.6-terra",
+      "problems": [],
+      "prompt_version": "detector-rule-proposal-v1",
+      "reason": "The reported method is not in SSLEngineSpec's local API scope: it configures an `SSLSocket` via `(socket as? SSLSocket)?.enabledProtocols`, not a `javax.net.ssl.SSLEngine`. It also contains no `setEnabledCipherSuites` event, although the specification's trace and conditional cipher constraints require observing both configuration calls and their ordering. A rule matching this method would necessarily broaden the target API to SSLSocket and/or infer missing configuration from outside the method, producing findings not justified by SSLEngineSpec and potentially continuing to fire after a correct SSLEngine-spec repair. Runtime array-content constraints for aliased/computed arrays likewise cannot be established from this method alone.",
+      "recorded_at": "2026-10-09T04:54:30+00:00",
+      "specification_sha256": "f2d222893ce58f6193e04c1ff3827f0797d001c2f4b5375abbc85c870a51d2c9",
+      "status": "not_local"
+    },
+    "SecretKeyFactorySpec": {
+      "attempts": 1,
+      "case_fingerprints": [
+        "3c950a75369089b4dad667ffeef422d2af45524b7ea14d09d6006d835540e1e2",
+        "9ce56c9abf6ce2a0bc7f6e4cde9eca0285de699e8684c9e1cafba1a338540fff"
+      ],
+      "cases": [],
+      "model": "gpt-5.6-terra",
+      "problems": [],
+      "prompt_version": "detector-rule-proposal-v1",
+      "reason": "not_local: the required generateSecret condition is the undocumented typestate predicate speccedKey[keySpec, _]. Its truth is not derivable from the reported method text in general: keySpec can be a parameter, returned by a helper, validated/created in another method, or have its relevant state established by an external analysis fact. A Semgrep rule that flags generateSecret when it cannot syntactically recognize a local PBEKeySpec construction would keep firing after correct repairs that establish speccedKey outside the reported method, and would fire on compliant callers/helpers.\n\nThe supplied AESObfuscator finding has a second locality problem: KEYGEN_ALGORITHM is defined outside the method. A rule can conservatively report every non-literal algorithm expression, which would fire on that example, but then it also reports a method whose external constant is one of the allowlisted values. Conversely, a literal-only rule would miss that required finding. The policy's documented static-analysis false-positive behavior does not provide a source-visible definition that Semgrep can use to distinguish those cases.\n\nA literal denylist rule could soundly catch the first PBKDF2WithHmacSHA1 example and silence if that literal is replaced locally with an allowlisted literal, but it would not implement SecretKeyFactorySpec's required protocol/predicate or reliably cover the second required case. Therefore an executable method-local Semgrep oracle would be unsafe.",
+      "recorded_at": "2026-10-20T05:08:41+00:00",
+      "specification_sha256": "b3fd022347e336741df2d5cb39fda4cd939fafbb0e75f9d90dae512c50bcde79",
+      "status": "not_local"
+    },
+    "SecretKeySpecSpec": {
+      "attempts": 1,
+      "case_fingerprints": [
+        "3ad5119d7fa90a887a2ba66554edc73458406a82d4c76797a3f1f8288cb48de0",
+        "3e7d4c772bd0bd58f0c8bf8285d56dd0cb0e3b10f536eaea299eaec27a244043",
+        "489e703e7390fb9f81702e3bea8c51e6ed8d73e90a9905f32c3a148f7e20a1d1",
+        "d2c8219872cfca769405572780a79f278c33eda648802883149803cc30042c05"
+      ],
+      "cases": [],
+      "model": "gpt-5.6-terra",
+      "problems": [],
+      "prompt_version": "detector-rule-proposal-v1",
+      "reason": "The required predicate is not locally decidable from the reported method with Semgrep syntax. A finding depends on detector-specific `preparedKeyMaterial[keyMaterial] || randomized[keyMaterial]` facts, including derivation/import/validation summaries that may be produced outside the method. A correct local repair may keep exactly the same `new SecretKeySpec(key, algorithm)` call while changing `key`'s provenance through a helper, caller, or library API; conversely, a locally apparent byte array may be compliant due to external validation. The two-argument event also specifies `length[keyMaterial] >= offset + len` while leaving `offset` and `len` unbound, so its required length condition has no source-level local interpretation. Algorithm membership may likewise depend on a constant or value resolved outside the method. Any broad constructor-call rule would continue firing after valid repairs, while a narrow literal/source-shape rule would miss the required variable-based findings and compliant provenance paths.",
+      "recorded_at": "2026-10-07T03:16:10+00:00",
+      "specification_sha256": "6ece7ede410774abd4bd757303f24a8e667fa01ee9c88aa342e6b5d10c329b00",
+      "status": "not_local"
+    }
+  }
+}

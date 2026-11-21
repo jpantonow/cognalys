@@ -1,0 +1,33 @@
+# Certificate or hostname validation disabled where the client is built:
+# an X509TrustManager whose checkServerTrusted accepts every chain (an empty
+# body), or a HostnameVerifier that accepts every host.
+# Does not see a trust-all manager built in another class and only used
+# here (seafile's UnsafeOkHttpClient): that finding is not reproduced.
+rules:
+  - id: trust-manager-accepts-every-chain
+    languages: [kotlin]
+    severity: ERROR
+    message: checkServerTrusted accepts every certificate chain
+    pattern: fun checkServerTrusted(...) {}
+  - id: trust-manager-accepts-every-chain-java
+    languages: [java]
+    severity: ERROR
+    message: checkServerTrusted accepts every certificate chain
+    pattern: |
+      public void checkServerTrusted(...) {}
+  - id: hostname-verifier-accepts-every-host
+    languages: [kotlin]
+    severity: ERROR
+    message: the HostnameVerifier accepts every host
+    pattern-either:
+      - pattern: 'hostnameVerifier { $A, $B -> true }'
+      - pattern: '$X.hostnameVerifier { $A, $B -> true }'
+      - pattern: 'HostnameVerifier { $A, $B -> true }'
+  - id: hostname-verifier-accepts-every-host-java
+    languages: [java]
+    severity: ERROR
+    message: the HostnameVerifier accepts every host
+    pattern-either:
+      - pattern: $X.hostnameVerifier(($A, $B) -> true)
+      - pattern: |
+          public boolean verify(String $A, SSLSession $B) { return true; }

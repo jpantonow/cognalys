@@ -1,0 +1,34 @@
+# An archive entry's name used as a path under a destination directory, in
+# a method that reads an archive, with no containment check in that method.
+# Repaired in the method: resolve the path canonically and check it stays
+# under the destination, or reject entry names containing "..".
+#
+# The method-level conditions are regular expressions over the reported
+# method's text (semgrep_rules.method_conditions_hold), not Semgrep
+# patterns: Semgrep's Kotlin matching does not reach into every block, and a
+# containment check it missed inside `try { }` would score a correct repair
+# as incorrect.
+rules:
+  - id: archive-entry-name-as-destination-path
+    languages: [java, kotlin]
+    severity: ERROR
+    message: an archive entry name becomes a file path without a containment check
+    metadata:
+      method_requires_any:
+        - 'ZipInputStream|ZipFile|JarInputStream|TarArchiveInputStream'
+        - '\.nextEntry\b|getNextEntry\s*\(|\.entries\s*\('
+      method_excludes_any:
+        # a canonical or normalised path compared with the destination
+        - '(canonicalPath|getCanonicalPath\s*\(\s*\)|canonicalFile|normalize\s*\(\s*\)|toRealPath\s*\([^)]*\))[^;\n]*\.startsWith\s*\('
+        - 'startsWith\s*\([^)]*(canonical|normalize)'
+        # the same check split across statements: a canonical or normalised
+        # path computed in the method, then compared against a
+        # separator-bounded root (omweather's repaired zipExtract,
+        # run_20260929_231422, was still reported as unrepaired)
+        - '(?s)(getCanonical(File|Path)\s*\(|canonical(File|Path)\b|normalize\s*\(\s*\)|toRealPath\s*\().*\.startsWith\s*\([^)]*[Ss]eparator'
+        # entry names with a parent reference rejected
+        - '\.contains\s*\(\s*"\.\."\s*\)'
+    pattern-either:
+      - pattern: new File($D, $E.getName())
+      - pattern: File($D, $E.name)
+      - pattern: File($D, $E.getName())

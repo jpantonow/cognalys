@@ -1,0 +1,8 @@
+{
+  "policy_id": "key_generation",
+  "version": "2.0",
+  "rules": [
+    "Resolve algorithm, provider, initialization arguments and generated-key consumers.",
+    "Do not infer invalid key size without an exact argument or runtime diagnostic."
+  ]
+}

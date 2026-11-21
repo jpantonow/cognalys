@@ -1,0 +1,22 @@
+# A Cipher transformation that is ECB (named, or AES with no mode, which
+# providers resolve to AES/ECB/PKCS5Padding) or a broken cipher (DES, 3DES,
+# RC2, RC4, Blowfish). RSA's "RSA/ECB/..." is the standard name of a
+# single-block RSA cipher, not ECB chaining, and is not reported.
+# Repaired where the Cipher is created: an authenticated mode such as
+# "AES/GCM/NoPadding" (or "AES/CBC/PKCS5Padding" with a random IV and a MAC).
+rules:
+  - id: cipher-ecb-or-broken-algorithm
+    languages: [java, kotlin]
+    severity: WARNING
+    metadata:
+      checks: [ALG]
+    message: Cipher uses ECB (explicitly or by default) or a broken algorithm
+    patterns:
+      - pattern-either:
+          - pattern: Cipher.getInstance("$T")
+          - pattern: Cipher.getInstance("$T", $P)
+          - pattern: javax.crypto.Cipher.getInstance("$T")
+          - pattern: javax.crypto.Cipher.getInstance("$T", $P)
+      - metavariable-regex:
+          metavariable: $T
+          regex: '(?i)^(?:(?:DES|DESede|TripleDES|Blowfish|RC2|RC4|ARCFOUR)(?:/.*)?|AES|(?!RSA/)[^/]+/ECB/[^/]*)$'

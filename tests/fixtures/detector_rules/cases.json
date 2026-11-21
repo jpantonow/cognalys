@@ -1,0 +1,287 @@
+{
+  "description": "Each Semgrep rule in data/detector_rules/semgrep against a vulnerable and a repaired version of the same method. `expect` is the replay status for that method: alert_present for the vulnerable code, alert_absent for the repair. The repaired versions are the usual repair for the specification, written in the method, including one inside try { } where Semgrep's Kotlin matching is weakest.",
+  "cases": [
+    {
+      "spec": "ZipSlipSpec",
+      "file": "ZipSlipSpec/positive.kt",
+      "method": "importNotes",
+      "expect": "alert_present"
+    },
+    {
+      "spec": "ZipSlipSpec",
+      "file": "ZipSlipSpec/fixed.kt",
+      "method": "importNotes",
+      "expect": "alert_absent"
+    },
+    {
+      "spec": "ZipSlipSpec",
+      "file": "ZipSlipSpec/positive_in_try.kt",
+      "method": "restore",
+      "expect": "alert_present"
+    },
+    {
+      "spec": "ZipSlipSpec",
+      "file": "ZipSlipSpec/fixed_in_try.kt",
+      "method": "restore",
+      "expect": "alert_absent"
+    },
+    {
+      "spec": "ZipSlipSpec",
+      "file": "ZipSlipSpec/positive.java",
+      "method": "extract",
+      "expect": "alert_present"
+    },
+    {
+      "spec": "ZipSlipSpec",
+      "file": "ZipSlipSpec/fixed.java",
+      "method": "extract",
+      "expect": "alert_absent"
+    },
+    {
+      "spec": "ZipSlipSpec",
+      "file": "ZipSlipSpec/fixed_split_check.java",
+      "method": "zipExtract",
+      "expect": "alert_absent"
+    },
+    {
+      "spec": "ZipSlipSpec",
+      "file": "ZipSlipSpec/positive_unrelated_startswith.java",
+      "method": "extract",
+      "expect": "alert_present"
+    },
+    {
+      "spec": "TLSCertificateValidationSpec",
+      "file": "TLSCertificateValidationSpec/positive.kt",
+      "method": "lanClient",
+      "expect": "alert_present"
+    },
+    {
+      "spec": "TLSCertificateValidationSpec",
+      "file": "TLSCertificateValidationSpec/fixed.kt",
+      "method": "lanClient",
+      "expect": "alert_absent"
+    },
+    {
+      "spec": "CursorLeakSpec",
+      "file": "CursorLeakSpec/positive.kt",
+      "method": "check",
+      "expect": "alert_present"
+    },
+    {
+      "spec": "CursorLeakSpec",
+      "file": "CursorLeakSpec/fixed.kt",
+      "method": "check",
+      "expect": "alert_absent"
+    },
+    {
+      "spec": "CursorLeakSpec",
+      "file": "CursorLeakSpec/fixed_in_try.kt",
+      "method": "check",
+      "expect": "alert_absent"
+    },
+    {
+      "spec": "WebViewSslErrorBypassSpec",
+      "file": "WebViewSslErrorBypassSpec/positive.kt",
+      "method": "configure",
+      "expect": "alert_present"
+    },
+    {
+      "spec": "WebViewSslErrorBypassSpec",
+      "file": "WebViewSslErrorBypassSpec/fixed.kt",
+      "method": "configure",
+      "expect": "alert_absent"
+    },
+    {
+      "spec": "WebViewSslErrorBypassSpec",
+      "file": "WebViewSslErrorBypassSpec/conditional.kt",
+      "method": "configure",
+      "expect": "alert_absent"
+    },
+    {
+      "spec": "WebViewDebuggingSpec",
+      "file": "WebViewDebuggingSpec/positive.kt",
+      "method": "setupWebView",
+      "expect": "alert_present"
+    },
+    {
+      "spec": "WebViewDebuggingSpec",
+      "file": "WebViewDebuggingSpec/fixed.kt",
+      "method": "setupWebView",
+      "expect": "alert_absent"
+    },
+    {
+      "spec": "WebViewMixedContentSpec",
+      "file": "WebViewMixedContentSpec/positive.kt",
+      "method": "createWebView",
+      "expect": "alert_present"
+    },
+    {
+      "spec": "WebViewMixedContentSpec",
+      "file": "WebViewMixedContentSpec/fixed.kt",
+      "method": "createWebView",
+      "expect": "alert_absent"
+    },
+    {
+      "spec": "WebViewMixedContentSpec",
+      "file": "WebViewMixedContentSpec/positive_qualified_in_apply.kt",
+      "method": "popupWebView",
+      "expect": "alert_present"
+    },
+    {
+      "spec": "WebViewFileAccessSpec",
+      "file": "WebViewFileAccessSpec/positive.kt",
+      "method": "searchView",
+      "expect": "alert_present"
+    },
+    {
+      "spec": "WebViewFileAccessSpec",
+      "file": "WebViewFileAccessSpec/fixed.kt",
+      "method": "searchView",
+      "expect": "alert_absent"
+    },
+    {
+      "spec": "NumberFormatCrashSpec",
+      "file": "NumberFormatCrashSpec/positive.java",
+      "method": "save",
+      "expect": "alert_present"
+    },
+    {
+      "spec": "NumberFormatCrashSpec",
+      "file": "NumberFormatCrashSpec/fixed.java",
+      "method": "save",
+      "expect": "alert_absent"
+    },
+    {
+      "spec": "MessageDigestSpec",
+      "file": "MessageDigestSpec/positive.java",
+      "method": "hash",
+      "expect": "alert_present"
+    },
+    {
+      "spec": "MessageDigestSpec",
+      "file": "MessageDigestSpec/fixed.java",
+      "method": "hash",
+      "expect": "alert_absent"
+    },
+    {
+      "spec": "MessageDigestSpec",
+      "file": "MessageDigestSpec/positive.kt",
+      "method": "fingerprint",
+      "expect": "alert_present"
+    },
+    {
+      "spec": "MessageDigestSpec",
+      "file": "MessageDigestSpec/fixed.kt",
+      "method": "fingerprint",
+      "expect": "alert_absent"
+    },
+    {
+      "spec": "CipherSpec",
+      "file": "CipherSpec/positive.java",
+      "method": "encrypt",
+      "expect": "alert_present"
+    },
+    {
+      "spec": "CipherSpec",
+      "file": "CipherSpec/fixed.java",
+      "method": "encrypt",
+      "expect": "alert_absent"
+    },
+    {
+      "spec": "CipherSpec",
+      "file": "CipherSpec/positive.kt",
+      "method": "seal",
+      "expect": "alert_present"
+    },
+    {
+      "spec": "CipherSpec",
+      "file": "CipherSpec/fixed.kt",
+      "method": "seal",
+      "expect": "alert_absent"
+    },
+    {
+      "spec": "SecretKeySpecSpec",
+      "file": "SecretKeySpecSpec/positive.java",
+      "method": "key",
+      "expect": "alert_present"
+    },
+    {
+      "spec": "SecretKeySpecSpec",
+      "file": "SecretKeySpecSpec/fixed.java",
+      "method": "key",
+      "expect": "alert_absent"
+    },
+    {
+      "spec": "SecretKeySpecSpec",
+      "file": "SecretKeySpecSpec/positive.kt",
+      "method": "key",
+      "expect": "alert_present"
+    },
+    {
+      "spec": "SecretKeySpecSpec",
+      "file": "SecretKeySpecSpec/fixed.kt",
+      "method": "key",
+      "expect": "alert_absent"
+    },
+    {
+      "spec": "IvParameterSpecSpec",
+      "file": "IvParameterSpecSpec/positive.java",
+      "method": "iv",
+      "expect": "alert_present"
+    },
+    {
+      "spec": "IvParameterSpecSpec",
+      "file": "IvParameterSpecSpec/fixed.java",
+      "method": "iv",
+      "expect": "alert_absent"
+    },
+    {
+      "spec": "IvParameterSpecSpec",
+      "file": "IvParameterSpecSpec/positive.kt",
+      "method": "iv",
+      "expect": "alert_present"
+    },
+    {
+      "spec": "IvParameterSpecSpec",
+      "file": "IvParameterSpecSpec/fixed.kt",
+      "method": "iv",
+      "expect": "alert_absent"
+    },
+    {
+      "spec": "PBEKeySpecSpec",
+      "file": "PBEKeySpecSpec/positive.java",
+      "method": "derive",
+      "expect": "alert_present"
+    },
+    {
+      "spec": "PBEKeySpecSpec",
+      "file": "PBEKeySpecSpec/fixed.java",
+      "method": "derive",
+      "expect": "alert_absent"
+    },
+    {
+      "spec": "PBEKeySpecSpec",
+      "file": "PBEKeySpecSpec/positive.kt",
+      "method": "derive",
+      "expect": "alert_present"
+    },
+    {
+      "spec": "PBEKeySpecSpec",
+      "file": "PBEKeySpecSpec/fixed.kt",
+      "method": "derive",
+      "expect": "alert_absent"
+    },
+    {
+      "spec": "SSLContextSpec",
+      "file": "SSLContextSpec/positive.java",
+      "method": "context",
+      "expect": "alert_present"
+    },
+    {
+      "spec": "SSLContextSpec",
+      "file": "SSLContextSpec/fixed.java",
+      "method": "context",
+      "expect": "alert_absent"
+    }
+  ]
+}

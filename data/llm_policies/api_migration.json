@@ -1,0 +1,11 @@
+{
+  "policy_id": "api_migration",
+  "version": "2.0",
+  "rules": [
+    "The subject is the deprecated API or library the detector message names; confirm from the reviewed source that it is imported and used there before treating the finding as confirmed.",
+    "Take the replacement from the official deprecation notice or migration guide for the named API, not from the detector message alone, and cite it.",
+    "Check the replacement against the module's minSdk, desugaring and existing dependencies; a replacement that needs a new library must declare it in the build file supplied as exact source.",
+    "Preserve observable behaviour: threading, lifecycle and callback order of the replaced API must be matched or the change must be review-only.",
+    "A migration that needs configuration outside the repository (a server project, credentials, a service account) cannot be completed client-side; record it as a publication blocker."
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "description": "Where a detector keeps the code that raises each finding code. detector_emitter.py finds the finding's code in the codes table, reads the source file and line it names, and hands that excerpt to evidence extraction and planning: the checker's own conditions and comments at the reporting site, which say what a fix has to change. A local checkout ($home_env/checkout_path) is read first; otherwise url_template at the pinned revision. A detector is added here, not in code.",
+  "detectors": [
+    {
+      "name": "rvsec",
+      "code_pattern": "^[A-Z0-9]+-[A-Z]+-\\d+$",
+      "home_env": "RVSEC_HOME",
+      "checkout_path": "rvsec/rvsec-mop/src/main/resources/jca_android",
+      "codes_file": "codes.csv",
+      "url_template": "https://raw.githubusercontent.com/PAMunb/rvsec/37efe5ed515dd65b1f512cacc9f8ed4a28e3e5f7/rvsec/rvsec-mop/src/main/resources/jca_android/{file}"
+    }
+  ]
+}

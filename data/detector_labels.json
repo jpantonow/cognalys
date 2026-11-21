@@ -1,0 +1,82 @@
+{
+  "description": "What each label and site kind of a detector's report means, and what kind of statement the report is (report). utils/detector_labels.py reads it: the importers write these meanings beside each finding, the analysis reads the current meaning of a known label instead of the text stored with the finding (only for a record whose code matches the detector's code_pattern), and the IV-origin gate and reported_by_detector ask the report kind, never the label name or its wording. Echo folding, the value-check gates of the semantic validation and RVSec's label priority still name RVSec's labels in code, so a label added here may also need a change there. outranks_rule_text_alternative is valid only on a report kind that records an observed fact: load_catalog refuses a catalogue that sets it on unobserved_origin or echo.",
+  "report_kinds": {
+    "value_check": {
+      "statement": "The check read a value at the reported call and the value is outside what it admits; value and expected carry what it saw and what it admits."
+    },
+    "order": {
+      "statement": "The calls on the object left the order the check admits."
+    },
+    "echo": {
+      "statement": "The report repeats one the analyzer already made about the object's producer or its creation."
+    },
+    "unobserved_origin": {
+      "statement": "The check recorded no producer for the object. That states what the analyzer saw, not what the object is: an origin the source establishes can answer it."
+    },
+    "unadmitted_origin": {
+      "statement": "The check recorded where the object came from, and that origin is not one it admits. The origin is known; what is reported is that the check does not accept it.",
+      "outranks_rule_text_alternative": true,
+      "rationale": "CometOTP EncryptionHelper.loadOrGenerateWrappedKey (agent_baseline_20261108, 2026-11-08/09): seven adjudications in seven runs answered detector_violation not_confirmed because the published rule lists randomized key material as an alternative, while the checker that ran admits only prepared key material and had recorded the SecureRandom origin."
+    }
+  },
+  "detectors": [
+    {
+      "name": "rvsec",
+      "code_pattern": "^[A-Z0-9]+-[A-Z]+-\\d+$",
+      "source": "The package's group guide (20260924_mop_errors_group_guide.md, sections 4.1, 4.2 and 5) and the checker's own comments at the reporting sites (data/detector_emitters.json names the revision).",
+      "not_observed_statement": "NOT OBSERVED: the runtime monitor tracks the producers a rule requires by object identity within one process, and saw none for this object. ",
+      "site_kinds": {
+        "ALG": "the algorithm or transformation string is not in the rule's allow-list",
+        "KEYSIZE": "a key size the rule does not admit for that algorithm",
+        "PROTO": "a TLS protocol the rule does not admit",
+        "KSTYPE": "a KeyStore type the rule does not admit",
+        "CONSTR": "a value constraint was broken, or a required origin was positively contradicted",
+        "FORB": "a forbidden method was called",
+        "ORDER": "the call sequence left the rule's order automaton",
+        "NOBS": "a required origin was not observed (not a positive contradiction)"
+      },
+      "labels": {
+        "violation": {
+          "report": "value_check",
+          "meaning": "A value check of the rule fired: an algorithm, key size, protocol, keystore type or other constraint outside what the rule admits, a required origin positively contradicted, or a forbidden call. The value seen and the admitted values are in value/expected."
+        },
+        "sequence": {
+          "report": "order",
+          "meaning": "The calls on the object left the order the rule admits."
+        },
+        "creation-unobserved": {
+          "report": "order",
+          "meaning": "An order failure on an object whose creation the monitor never observed; usually a gap in observation rather than a misuse."
+        },
+        "creation-refused": {
+          "report": "echo",
+          "meaning": "An order failure that echoes a creation the monitor already refused."
+        },
+        "reuse-after-final": {
+          "report": "order",
+          "meaning": "A Cipher or Mac was initialised again after a finished operation."
+        },
+        "platform-default": {
+          "report": "unobserved_origin",
+          "meaning": "NOT OBSERVED: the runtime monitor tracks the producers a rule requires by object identity within one process, and saw none for this object. The argument was null, which the API documents as 'use the platform default' (e.g. SSLContext.init(null, null, null)). That is not a security defect in itself, but the rule's producer requirement is unmet. Whether an explicit producer yields the identical default object the null selects decides between a change that only satisfies the rule and no change. An explicit producer counts only when it follows the same path and passes no other null or default argument to a governed API; one that does only moves this report to that API. An explicit argument that skips platform configuration the null applies is not identical: a trust factory given a loaded key store instead of null no longer follows the Network Security Config."
+        },
+        "upstream-refused": {
+          "report": "echo",
+          "meaning": "NOT OBSERVED: the runtime monitor tracks the producers a rule requires by object identity within one process, and saw none for this object. The producer of this object was itself already reported; this is an echo of that report."
+        },
+        "application-manager": {
+          "report": "unobserved_origin",
+          "meaning": "NOT OBSERVED: the runtime monitor tracks the producers a rule requires by object identity within one process, and saw none for this object. The TrustManager[] given to SSLContext.init holds a trust manager class the application defines. That covers both a manager that accepts every certificate and one that validates; the body of its checkServerTrusted (and the condition under which it is installed) decides which."
+        },
+        "random-key-material": {
+          "report": "unadmitted_origin",
+          "meaning": "The check requires key bytes that a monitored key or key agreement handed out (Key.getEncoded(), or the shared secret a key agreement returns) and recorded no such preparation for this array. It did record the array's origin: a SecureRandom the monitor observed filled it. The origin is therefore known, not a gap in what the monitor sees, and it is one this check does not admit: the checker's own note at this site says that filling a byte array from a SecureRandom and constructing a SecretKeySpec from it does not satisfy the requirement, while generating a key, taking its encoding and constructing from that does. The NOBS in the code only says that the required preparation was not recorded. The label states an origin, not a weakness: whether a key made this way is any weaker is a question of security impact, apart from whether the check's requirement is met."
+        },
+        "not-observed": {
+          "report": "unobserved_origin",
+          "meaning": "NOT OBSERVED: the runtime monitor tracks the producers a rule requires by object identity within one process, and saw none for this object. No admitted producer was seen (e.g. SecureRandom for an IV, salt or seed; Key.getEncoded() for key bytes). The monitor cannot tell innocent cases -- bytes read back from storage, an IV parsed from the ciphertext, a producer it does not see -- from the defective one: bytes that are constants compiled into the application or derived from constants. Where the bytes come from decides it."
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+# File-URL cross-origin access enabled on a WebView.
+# Repaired where it is set: the flag set to false or the call removed.
+rules:
+  - id: webview-file-url-access-enabled
+    languages: [java, kotlin]
+    severity: WARNING
+    message: WebView lets file:// pages read other file or network origins
+    pattern-either:
+      - pattern: $S.setAllowFileAccessFromFileURLs(true)
+      - pattern: $S.setAllowUniversalAccessFromFileURLs(true)
+      - pattern: $S.allowFileAccessFromFileURLs = true
+      - pattern: $S.allowUniversalAccessFromFileURLs = true
+      - pattern: allowFileAccessFromFileURLs = true
+      - pattern: allowUniversalAccessFromFileURLs = true

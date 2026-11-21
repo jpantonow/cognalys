@@ -1,0 +1,19 @@
+# An IV that is the same on every encryption: a zero-filled array of a
+# fixed size, a string literal's bytes or a byte-array literal. With a
+# fixed IV, CBC leaks equal plaintext prefixes and GCM loses its guarantees.
+# Repaired where the IV is made: random bytes (SecureRandom) per encryption,
+# stored with the ciphertext.
+rules:
+  - id: iv-is-constant
+    languages: [java, kotlin]
+    severity: WARNING
+    metadata:
+      checks: [CONSTR, NOBS]
+    message: the IV is the same on every encryption
+    pattern-either:
+      - pattern: new IvParameterSpec(new byte[$N])
+      - pattern: new IvParameterSpec(new byte[] {...})
+      - pattern: new IvParameterSpec("$X".getBytes(...))
+      - pattern: IvParameterSpec(ByteArray($N))
+      - pattern: IvParameterSpec(byteArrayOf(...))
+      - pattern: IvParameterSpec("$X".toByteArray(...))

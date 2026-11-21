@@ -1,0 +1,10 @@
+{
+  "_about": "First platform release whose system trust store includes each root, by the root's common name. A bundled anchor is explained to the maintainer with this entry and the app's minSdk; a root missing here is explained without a release. Add an entry only from a published source.",
+  "android": {
+    "ISRG Root X1": {
+      "api_level": 25,
+      "release": "7.1.1",
+      "source": "https://letsencrypt.org/2023/07/10/cross-sign-expiration"
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "policy_id": "message_digest",
+  "version": "2.0",
+  "rules": [
+    "Classify digest usage before judging security impact.",
+    "Do not infer adversarial integrity or authentication from an equality comparison alone.",
+    "Do not replace a client digest when the expected value is an unchanged external contract.",
+    "A cache, runtime discriminator, persisted identifier and security digest require different migration evidence."
+  ]
+}

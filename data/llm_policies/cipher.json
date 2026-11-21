@@ -1,0 +1,9 @@
+{
+  "policy_id": "cipher",
+  "version": "2.0",
+  "rules": [
+    "Evaluate transformation, initialization, nonce lifecycle, authentication and key provenance separately.",
+    "A transformation-only replacement is insufficient when an initialized Cipher or nonce is reused.",
+    "Never introduce a constant key, IV or nonce."
+  ]
+}

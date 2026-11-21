@@ -1,0 +1,11 @@
+{
+  "policy_id": "dependency",
+  "version": "2.0",
+  "rules": [
+    "Map the finding to one declared artifact and resolved version: from the library the detector message names when it names one (DEPF), otherwise from the reported class.",
+    "A version change edits the declaration where the project keeps it -- version catalog, versions.properties, constant or literal -- and only that declaration, using the build file supplied as exact source.",
+    "A change that crosses a major version is an API migration: every affected call site must be in the plan, or the change is review-only.",
+    "Require an official advisory, release note or migration guide for a target version or replacement.",
+    "Do not propose forks, VCS coordinates, private rebuilt binaries or capability-losing replacements."
+  ]
+}

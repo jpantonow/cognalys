@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cognalys"
+version = "0.1.0"
+description = "Evidence-guided repair of API misuses reported in Android applications"
+readme = "README.md"
+requires-python = ">=3.10"
+# requirements.txt stays the full list of the experimental environment, and
+# requirements.lock its pinned versions; these are what the package imports.
+dependencies = [
+    "requests",
+    "urllib3",
+    "tree-sitter==0.26.0",
+    "tree-sitter-java==0.23.5",
+    "tree-sitter-kotlin==1.1.0",
+    # The pipeline's preflight runs pyflakes over the code before a run.
+    "pyflakes",
+]
+
+[project.scripts]
+cognalys = "cognalys.cli:main"
+
+[project.optional-dependencies]
+# Corpus sampling and filtering (cognalys.corpus, legado/scripts/filtro*.py, the notebook).
+research = ["numpy", "pandas", "pulp"]
+dev = ["pytest"]
+# llm-provider = "anthropic" (cognalys.llm.llm_providers.AnthropicProvider).
+anthropic = ["anthropic>=1.15,<2"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["cognalys*"]
+
+[tool.setuptools.package-data]
+# PEP 561: the package ships its type annotations.
+cognalys = ["py.typed", "llm/data/*.json"]

@@ -1,0 +1,35 @@
+# User text parsed as a number with no handling of the parse failure.
+# Repaired where it is parsed: try/catch NumberFormatException, or
+# toIntOrNull()/validation before parsing.
+rules:
+  - id: unguarded-number-parse-of-view-text
+    languages: [java]
+    severity: WARNING
+    message: text from a view is parsed as a number without handling a malformed value
+    patterns:
+      - pattern-either:
+          - pattern: Integer.parseInt($X.getText().toString())
+          - pattern: Long.parseLong($X.getText().toString())
+          - pattern: Double.parseDouble($X.getText().toString())
+          - pattern: Float.parseFloat($X.getText().toString())
+          - pattern: Integer.valueOf($X.getText().toString())
+      - pattern-not-inside: |
+          try { ... } catch (NumberFormatException $E) { ... }
+      - pattern-not-inside: |
+          try { ... } catch (Exception $E) { ... }
+      - pattern-not-inside: |
+          try { ... } catch (RuntimeException $E) { ... }
+  - id: unguarded-number-parse-of-view-text-kotlin
+    languages: [kotlin]
+    severity: WARNING
+    message: text from a view is parsed as a number without handling a malformed value
+    patterns:
+      - pattern-either:
+          - pattern: $X.text.toString().toInt()
+          - pattern: $X.text.toString().toLong()
+          - pattern: $X.text.toString().toDouble()
+          - pattern: Integer.parseInt($X.text.toString())
+      - pattern-not-inside: |
+          try { ... } catch ($E: NumberFormatException) { ... }
+      - pattern-not-inside: |
+          try { ... } catch ($E: Exception) { ... }

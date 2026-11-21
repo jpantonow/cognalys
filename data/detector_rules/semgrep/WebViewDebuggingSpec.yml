@@ -1,0 +1,16 @@
+# WebView.setWebContentsDebuggingEnabled(true) outside a debug-build guard.
+# Repaired where it is called: guarded by BuildConfig.DEBUG / FLAG_DEBUGGABLE,
+# or passed a debug-derived value instead of the literal true.
+rules:
+  - id: webview-debugging-enabled-unguarded
+    languages: [java, kotlin]
+    severity: WARNING
+    message: WebView content debugging is enabled without a debug-build guard
+    patterns:
+      - pattern-either:
+          - pattern: WebView.setWebContentsDebuggingEnabled(true)
+          - pattern: android.webkit.WebView.setWebContentsDebuggingEnabled(true)
+      - pattern-not-inside: |
+          if (<... BuildConfig.DEBUG ...>) { ... }
+      - pattern-not-inside: |
+          if (<... ApplicationInfo.FLAG_DEBUGGABLE ...>) { ... }

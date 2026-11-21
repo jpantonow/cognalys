@@ -1,0 +1,8 @@
+{
+  "policy_id": "generic",
+  "version": "2.0",
+  "rules": [
+    "Use only the supplied specification semantics and evidence requirements.",
+    "Unknown detector semantics or incomplete local scope require abstention or review."
+  ]
+}

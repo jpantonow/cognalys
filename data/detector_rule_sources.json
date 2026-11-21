@@ -1,0 +1,17 @@
+{
+  "description": "Where each detector family publishes the rule a finding is reported under. generate_specifications.py fills {spec} (the specification name) or {api_type} (the governed type derived from it under the CrySL naming convention), keeps the first page that actually declares that rule, and hands the rule text to specification generation as its authority. A detector family whose rules live elsewhere is added here, not in code.",
+  "sources": [
+    {
+      "name": "javamop_property",
+      "format": "mop",
+      "governs": "spec",
+      "url_template": "https://raw.githubusercontent.com/SoftEngResearch/javamop-agent-bundle/refs/heads/master/props/{spec}.mop"
+    },
+    {
+      "name": "crysl_rule",
+      "format": "crysl",
+      "governs": "api_type",
+      "url_template": "https://raw.githubusercontent.com/CROSSINGTUD/Crypto-API-Rules/refs/heads/master/JavaCryptographicArchitecture/src/{api_type}.crysl"
+    }
+  ]
+}

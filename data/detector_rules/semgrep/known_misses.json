@@ -1,0 +1,11 @@
+{
+  "description": "Findings of a covered specification that its rule is known not to reproduce, with the reason. scripts/validate_detector_rules.py reports them as expected instead of failing. A finding listed here gets alert_absent on its baseline, so a patch for it is `unverified` (violation not reproduced), never `repaired`.",
+  "misses": [
+    {
+      "spec": "TLSCertificateValidationSpec",
+      "class": "com.seafile.seadroid2.ui.media.player.CustomExoVideoPlayerActivity",
+      "method": "getMediaSource",
+      "reason": "the trust-all X509TrustManager and HostnameVerifier are built in UnsafeOkHttpClient, another class; the reported method only uses it, and a rule local to the method cannot see across the call"
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "_about": "Warning ids whose suppression records that a maintainer saw a security check and kept the code (deliberate_insecurity.py). A suppression of one of these ids on the finding's method, its enclosing class, its file or a statement inside it is shown to the model as evidence that the flagged behaviour is intentional; it never decides the finding. Add an id only from the analyzer's published documentation. `apis` are the names (matched case-insensitively) whose presence at the reported line, or in the method when the line is unknown, makes a suppression of that id about the finding: a SetJavaScriptEnabled suppression on an onCreate reported for a GCMParameterSpec is not.",
+  "android_lint": {
+    "_source": "https://googlesamples.github.io/android-custom-lint-rules/checks/index.md.html",
+    "ids": {
+      "TrustAllX509TrustManager": {"concern": "an X509TrustManager whose checkServerTrusted accepts every certificate", "doc": "https://googlesamples.github.io/android-custom-lint-rules/checks/TrustAllX509TrustManager.md.html", "apis": ["TrustManager", "SSLContext", "checkServerTrusted", "SSLSocketFactory"]},
+      "CustomX509TrustManager": {"concern": "an application-defined X509TrustManager", "doc": "https://googlesamples.github.io/android-custom-lint-rules/checks/CustomX509TrustManager.md.html", "apis": ["TrustManager", "SSLContext", "checkServerTrusted", "SSLSocketFactory"]},
+      "AllowAllHostnameVerifier": {"concern": "a HostnameVerifier that accepts every host", "doc": "https://googlesamples.github.io/android-custom-lint-rules/checks/AllowAllHostnameVerifier.md.html", "apis": ["HostnameVerifier", "SSLContext", "SSLSocketFactory"]},
+      "BadHostnameVerifier": {"concern": "a HostnameVerifier that always returns true", "doc": "https://googlesamples.github.io/android-custom-lint-rules/checks/BadHostnameVerifier.md.html", "apis": ["HostnameVerifier", "SSLContext", "SSLSocketFactory"]},
+      "SSLCertificateSocketFactoryCreateSocket": {"concern": "an SSLCertificateSocketFactory socket created from an InetAddress, without hostname verification", "doc": "https://googlesamples.github.io/android-custom-lint-rules/checks/SSLCertificateSocketFactoryCreateSocket.md.html", "apis": ["SSLCertificateSocketFactory", "SocketFactory"]},
+      "SSLCertificateSocketFactoryGetInsecure": {"concern": "SSLCertificateSocketFactory.getInsecure, which skips certificate checks", "doc": "https://googlesamples.github.io/android-custom-lint-rules/checks/SSLCertificateSocketFactoryGetInsecure.md.html", "apis": ["SSLCertificateSocketFactory", "SocketFactory"]},
+      "WebViewClientOnReceivedSslError": {"concern": "a WebViewClient whose onReceivedSslError proceeds past certificate errors", "doc": "https://googlesamples.github.io/android-custom-lint-rules/checks/WebViewClientOnReceivedSslError.md.html", "apis": ["onReceivedSslError", "SslErrorHandler"]},
+      "SetJavaScriptEnabled": {"concern": "JavaScript enabled in a WebView", "doc": "https://googlesamples.github.io/android-custom-lint-rules/checks/SetJavaScriptEnabled.md.html", "apis": ["setJavaScriptEnabled", "javaScriptEnabled"]},
+      "AddJavascriptInterface": {"concern": "an object exposed to WebView JavaScript", "doc": "https://googlesamples.github.io/android-custom-lint-rules/checks/AddJavascriptInterface.md.html", "apis": ["addJavascriptInterface"]},
+      "InsecureBaseConfiguration": {"concern": "a network security base configuration that permits cleartext traffic", "doc": "https://googlesamples.github.io/android-custom-lint-rules/checks/InsecureBaseConfiguration.md.html", "apis": ["cleartext"]},
+      "AcceptsUserCertificates": {"concern": "a network security configuration that trusts user-installed certificates", "doc": "https://googlesamples.github.io/android-custom-lint-rules/checks/AcceptsUserCertificates.md.html", "apis": ["certificates", "TrustManager"]},
+      "GetInstance": {"concern": "Cipher.getInstance with ECB or without an explicit mode", "doc": "https://googlesamples.github.io/android-custom-lint-rules/checks/GetInstance.md.html", "apis": ["Cipher"]},
+      "SecureRandom": {"concern": "SecureRandom seeded with a fixed or predictable value", "doc": "https://googlesamples.github.io/android-custom-lint-rules/checks/SecureRandom.md.html", "apis": ["SecureRandom", "setSeed"]},
+      "TrulyRandom": {"concern": "SecureRandom on platforms with the weak default seed", "doc": "https://googlesamples.github.io/android-custom-lint-rules/checks/TrulyRandom.md.html", "apis": ["SecureRandom"]},
+      "DeletedProvider": {"concern": "the removed Crypto security provider", "doc": "https://googlesamples.github.io/android-custom-lint-rules/checks/DeletedProvider.md.html", "apis": ["getInstance"]},
+      "DeprecatedProvider": {"concern": "the deprecated BC security provider", "doc": "https://googlesamples.github.io/android-custom-lint-rules/checks/DeprecatedProvider.md.html", "apis": ["getInstance"]},
+      "PackagedPrivateKey": {"concern": "a private key packaged with the app", "doc": "https://googlesamples.github.io/android-custom-lint-rules/checks/PackagedPrivateKey.md.html", "apis": ["PrivateKey", "KeyStore"]},
+      "HardcodedDebugMode": {"concern": "android:debuggable set in the manifest", "doc": "https://googlesamples.github.io/android-custom-lint-rules/checks/HardcodedDebugMode.md.html", "apis": ["debuggable"]},
+      "WorldReadableFiles": {"concern": "files opened MODE_WORLD_READABLE", "doc": "https://googlesamples.github.io/android-custom-lint-rules/checks/WorldReadableFiles.md.html", "apis": ["MODE_WORLD"]},
+      "WorldWriteableFiles": {"concern": "files opened MODE_WORLD_WRITEABLE", "doc": "https://googlesamples.github.io/android-custom-lint-rules/checks/WorldWriteableFiles.md.html", "apis": ["MODE_WORLD"]}
+    }
+  },
+  "sonar": {
+    "_source": "https://rules.sonarsource.com/java/type/Security%20Hotspot/",
+    "ids": {
+      "S4830": {"concern": "server certificates not verified", "doc": "https://rules.sonarsource.com/java/RSPEC-4830/", "apis": ["TrustManager", "SSLContext", "checkServerTrusted", "SSLSocketFactory"]},
+      "S5527": {"concern": "server hostnames not verified", "doc": "https://rules.sonarsource.com/java/RSPEC-5527/", "apis": ["HostnameVerifier", "SSLContext", "SSLSocketFactory"]},
+      "S4423": {"concern": "weak SSL/TLS protocols", "doc": "https://rules.sonarsource.com/java/RSPEC-4423/", "apis": ["SSLContext", "getInstance"]},
+      "S5547": {"concern": "weak cipher algorithms", "doc": "https://rules.sonarsource.com/java/RSPEC-5547/", "apis": ["Cipher"]},
+      "S5542": {"concern": "insecure encryption modes or padding", "doc": "https://rules.sonarsource.com/java/RSPEC-5542/", "apis": ["Cipher"]},
+      "S4790": {"concern": "weak hashing algorithms", "doc": "https://rules.sonarsource.com/java/RSPEC-4790/", "apis": ["MessageDigest", "getInstance"]},
+      "S2245": {"concern": "pseudorandom number generators", "doc": "https://rules.sonarsource.com/java/RSPEC-2245/", "apis": ["Random"]},
+      "S4426": {"concern": "insufficient key sizes", "doc": "https://rules.sonarsource.com/java/RSPEC-4426/", "apis": ["KeyPairGenerator", "KeyGenerator", "initialize"]},
+      "S6301": {"concern": "unencrypted database", "doc": "https://rules.sonarsource.com/java/RSPEC-6301/", "apis": ["SQLite", "Database"]}
+    }
+  }
+}

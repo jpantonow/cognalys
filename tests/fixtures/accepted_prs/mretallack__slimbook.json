@@ -1,0 +1,8 @@
+{
+ "pull_request": "https://github.com/mretallack/SlimBook/pull/3",
+ "outcome": "merged",
+ "spec": "WebViewDebuggingSpec",
+ "csv_class": "uk.org.retallack.slimbook.MainActivity",
+ "method_name": "setupWebView",
+ "diff": "diff --git a/app/src/main/java/uk/org/retallack/slimbook/MainActivity.kt b/app/src/main/java/uk/org/retallack/slimbook/MainActivity.kt\nindex 6beb9ad..d7531d1 100644\n--- a/app/src/main/java/uk/org/retallack/slimbook/MainActivity.kt\n+++ b/app/src/main/java/uk/org/retallack/slimbook/MainActivity.kt\n@@ -161,7 +161,9 @@ class MainActivity : AppCompatActivity() {\n     }\n \n     private fun setupWebView() {\n-        WebView.setWebContentsDebuggingEnabled(true)\n+        if ((applicationInfo.flags and android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE) != 0) {\n+            WebView.setWebContentsDebuggingEnabled(true)\n+        }\n         webView.settings.apply {\n             javaScriptEnabled = true\n             domStorageEnabled = true"
+}

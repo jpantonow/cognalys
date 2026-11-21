@@ -1,0 +1,32 @@
+{
+  "findings": {
+    "org.pwsafe.lib.file.PwsFile:::getCipher:::CipherSpec:::MissingAuthentication:::expecting authenticated encryption for in-memory password records but found AES/CTR/NoPadding.": {
+      "authorized": true,
+      "scope": "Only the ephemeral in-memory representation protected by PwsFile's memory key; the persisted PasswordSafe file format must remain unchanged.",
+      "usage_classification": "ephemeral_sensitive",
+      "legacy_compatibility_required": false,
+      "strategy": "Replace cached CTR Ciphers and the shared memoryIv with high-level authenticated in-memory seal/unseal operations. Use AES/GCM/NoPadding with a new provider-generated key-compatible Cipher and a fresh 12-byte random nonce for every sealed value. Store nonce and ciphertext including the authentication tag in the in-memory wrapper and reconstruct a decrypt Cipher from that value's nonce. Never reuse an initialized encryption Cipher or nonce.",
+      "required_consumers": [
+        "org.pwsafe.lib.file.PwsFile.passphrase",
+        "org.pwsafe.lib.file.AbstractPwsPasswdField",
+        "org.pwsafe.lib.file.PwsPassword",
+        "org.pwsafe.lib.file.PwsFileV3.sealedHeaderV3"
+      ],
+      "platform_constraints": {
+        "android_min_sdk": 21,
+        "must_support_api_21": true,
+        "provider_selection": "Retain Cipher.getInstance without a named provider.",
+        "forbidden_fallback": "Do not fall back to CTR, CBC, a fixed nonce, or unauthenticated encryption."
+      },
+      "required_tests": [
+        "Round-trip every protected in-memory value.",
+        "Assert distinct nonces for two encryptions under the same PwsFile memory key.",
+        "Assert modified nonce, ciphertext, or authentication tag is rejected.",
+        "Run existing PasswordSafe file create, save, reload, and field-value round trips without changing the persisted file format.",
+        "Run the implementation on the module's Android API 21 baseline."
+      ],
+      "review_fallback": "If exact repository evidence cannot prove that the protected representation remains ephemeral or API 21 behavior cannot be validated, generate MULTI_FILE_FIX_PROPOSED_FOR_REVIEW with manual_review_required=true instead of abstaining."
+    }
+  },
+  "families": []
+}

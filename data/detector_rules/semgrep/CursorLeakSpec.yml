@@ -1,0 +1,19 @@
+# A Cursor obtained from a query and neither consumed by use {} nor closed
+# in a finally block of the same method, so some path leaves it open.
+# Repaired in the method: query(...).use { ... } or try/finally close().
+#
+# The exclusions are over the method's text with the Cursor's own variable
+# name bound from the match (semgrep_rules.method_conditions_hold): Semgrep's
+# Kotlin matching missed a finally block nested in another try, which would
+# have scored a correct repair as incorrect.
+rules:
+  - id: cursor-not-closed-on-every-path
+    languages: [kotlin]
+    severity: WARNING
+    message: a Cursor from query() is not closed on every path
+    metadata:
+      bind: 'val\s+(?P<C>\w+)\s*='
+      method_excludes_any:
+        - '\b{{C}}\s*\??\s*\.\s*use\s*\{'
+        - 'finally\s*\{[^}]*\b{{C}}\s*\??\s*\.\s*close\s*\(\s*\)'
+    pattern: val $C = $M.query(...)
